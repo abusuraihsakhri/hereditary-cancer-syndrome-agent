@@ -80,7 +80,7 @@ def main(argv=None):
             print(f"Error reading input file: {e}", file=sys.stderr)
             return 1
 
-        out_fields = fieldnames + ["overall_status", "total_alerts", "stat_critical_alerts", "consensus_summary"]
+        out_fields = list(dict.fromkeys(fieldnames + ["overall_status", "total_alerts", "stat_critical_alerts", "consensus_summary"]))
         out_rows = []
         errors = 0
         for idx, r in enumerate(rows):
@@ -116,9 +116,11 @@ def main(argv=None):
             import uvicorn
             from .server import create_app
             app = create_app()
-            if app:
-                print(f"Starting HereditaryCancer Sentinel: Germline Variant & NCCN Genetic Testing Criteria Agent on http://{args.host}:{args.port}")
-                uvicorn.run(app, host=args.host, port=args.port)
+            if app is None:
+                print("FastAPI is not installed; install the server extra.", file=sys.stderr)
+                return 1
+            print(f"Starting demonstration server on http://{args.host}:{args.port}")
+            uvicorn.run(app, host=args.host, port=args.port)
         except ImportError:
             print("FastAPI / uvicorn not installed. Run 'pip install fastapi uvicorn'")
             return 1
