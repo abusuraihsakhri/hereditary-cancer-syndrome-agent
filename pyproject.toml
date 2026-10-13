@@ -29,3 +29,7 @@ hereditary-cancer-syndrome-engine = "hereditary_cancer_syndrome_agent.cli:main"
 [project.urls]
 Homepage = "https://github.com/abusuraihsakhri/hereditary-cancer-syndrome-agent"
 Repository = "https://github.com/abusuraihsakhri/hereditary-cancer-syndrome-engine.git"
+
+[tool.setuptools]
+packages = ["agents", "hereditary_cancer_syndrome_agent"]
+py-modules = ["cli", "hereditary_cancer", "enrichment", "simulator", "hereditary_cancer_app", "hereditary_cancer_syndrome_agent_app"]
