@@ -1,9 +1,10 @@
 """
 Clinical Data Models & Enums for HereditaryCancer Sentinel: Germline Variant & NCCN Genetic Testing Criteria Agent.
 Domain: Cancer Genetics
-Standard: NCCN Genetic / Familial High-Risk Criteria
+Standard: Illustrative demonstration rules, not clinical criteria
 """
 import datetime
+import math
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import Dict, List, Optional, Any
@@ -34,6 +35,21 @@ class ClinicalCasePayload:
     biomarkers: Dict[str, Any] = field(default_factory=dict)
     timestamp: str = field(default_factory=lambda: datetime.datetime.now(datetime.timezone.utc).isoformat())
 
+    def __post_init__(self):
+        for name in ("case_id", "patient_synthetic_id"):
+            val = getattr(self, name)
+            if not isinstance(val, str) or not val.strip():
+                raise ValueError(f"{name} must be a non-empty string")
+            setattr(self, name, val.strip())
+        for name in ("primary_metric", "secondary_metric"):
+            val = getattr(self, name)
+            if isinstance(val, bool) or not isinstance(val, (int, float)) or not math.isfinite(val):
+                raise ValueError(f"{name} must be a finite number")
+        if not isinstance(self.status_flag, str):
+            raise ValueError("status_flag must be a string")
+        if not isinstance(self.biomarkers, dict):
+            raise ValueError("biomarkers must be a dictionary")
+
 
 @dataclass
 class AgentAlert:
@@ -43,7 +59,7 @@ class AgentAlert:
     title: str
     clinical_finding: str
     actionable_recommendation: str
-    guideline_citation: str = "NCCN Genetic / Familial High-Risk Criteria"
+    guideline_citation: str = "Illustrative demonstration rules (not NCCN criteria)"
     timestamp: str = field(default_factory=lambda: datetime.datetime.now(datetime.timezone.utc).isoformat())
 
     def to_dict(self) -> Dict[str, Any]:
