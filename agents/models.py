@@ -1,7 +1,7 @@
 """
 Pydantic v2 schemas and data definitions for Hereditary Cancer Syndrome Agent.
 Domain: Clinical & Biomedical AI
-Standard: CAP / CLSI / ISO Standards
+Standard: Illustrative demonstration rules; not clinical criteria
 """
 import datetime
 import math
@@ -54,7 +54,7 @@ class AgentAlert(BaseModel):
     summary: str
     technical_details: str
     actionable_remediation: str
-    standard_reference: str = "CAP / CLSI / ISO Standards"
+    standard_reference: str = "Illustrative demonstration rules (not clinical criteria)"
     timestamp: str = Field(default_factory=lambda: datetime.datetime.now(datetime.timezone.utc).isoformat())
 
     def to_dict(self) -> Dict[str, Any]:

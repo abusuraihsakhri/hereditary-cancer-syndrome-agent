@@ -10,11 +10,11 @@ coordinator = CancerGeneticsCoordinator()
 def create_app():
     try:
         from fastapi import FastAPI
-        from pydantic import BaseModel
+        from pydantic import BaseModel, Field
 
         app = FastAPI(
             title="HereditaryCancer Sentinel: Germline Variant & NCCN Genetic Testing Criteria Agent",
-            description="Audits patient personal and 3-generation family cancer histories against NCCN criteria for BRCA1/2, Lynch syndrome (MLH1/MSH2/MSH6), and TP53.",
+            description="Illustrative numeric and keyword rules; not NCCN hereditary cancer criteria or clinical decision support.",
             version="2.0.0-PRO",
         )
 
@@ -26,7 +26,7 @@ def create_app():
             status_flag: str = "DISCORDANT"
             is_stat: bool = True
             clinical_notes: str = ""
-            biomarkers: Dict[str, Any] = {}
+            biomarkers: Dict[str, Any] = Field(default_factory=dict)
 
         class ChatRequest(BaseModel):
             query: str

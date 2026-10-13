@@ -1,7 +1,7 @@
 """
-Clinical Algorithmic Engine & Guideline Rules for HereditaryCancer Sentinel: Germline Variant & NCCN Genetic Testing Criteria Agent.
+Illustrative numerical rules only; not validated hereditary cancer criteria.
 Domain: Cancer Genetics
-Standard: NCCN Genetic / Familial High-Risk Criteria
+Standard: Synthetic demonstration thresholds; not NCCN clinical criteria
 """
 import math
 from typing import Dict, Any, List, Optional
@@ -9,7 +9,7 @@ from .models import ClinicalCasePayload, AgentAlert, UrgencyLevel, ClinicalInteg
 
 
 class ClinicalDomainEngine:
-    GUIDELINE = "NCCN Genetic / Familial High-Risk Criteria"
+    GUIDELINE = "Demonstration thresholds (not NCCN criteria)"
     PRIMARY_BASELINE_LIMIT = 20.0
     SECONDARY_ALERT_LIMIT = 10.0
 
@@ -18,8 +18,8 @@ class ClinicalDomainEngine:
         if value > cls.PRIMARY_BASELINE_LIMIT:
             return {
                 "title": "Primary Metric Threshold Exceeded",
-                "finding": f"Observed value ({value:.2f}) exceeds NCCN Genetic / Familial High-Risk Criteria clinical baseline limit ({cls.PRIMARY_BASELINE_LIMIT:.1f}).",
-                "recommendation": "Perform immediate secondary verification and calibration review.",
+                "finding": f"Observed value ({value:.2f}) exceeds the illustrative primary threshold ({cls.PRIMARY_BASELINE_LIMIT:.1f}).",
+                "recommendation": "Review the synthetic input and the demonstration threshold.",
             }
         return None
 
@@ -27,19 +27,19 @@ class ClinicalDomainEngine:
     def evaluate_secondary_kinetics(cls, value: float, is_stat: bool) -> Optional[Dict[str, Any]]:
         if value > cls.SECONDARY_ALERT_LIMIT or is_stat:
             return {
-                "title": "STAT Kinetic Escalation Triggered",
-                "finding": f"Kinetic parameter ({value:.2f}) with STAT={is_stat} requires prioritized supervision.",
-                "recommendation": "Activate closed-loop verbal clinician notification protocol per Joint Commission standards.",
+                "title": "Demonstration Secondary Flag Triggered",
+                "finding": f"Kinetic parameter ({value:.2f}) with STAT={is_stat} matched a demonstration rule.",
+                "recommendation": "Review the demonstration input; no clinical action is prescribed.",
             }
         return None
 
     @classmethod
     def evaluate_biomarker_concordance(cls, status_flag: str, biomarkers: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         status_upper = str(status_flag).upper()
-        if "DISCORDANT" in status_upper or "EQUIVOCAL" in status_upper or "MUTANT" in status_upper:
+        if "DISCORDANT" in status_upper or "EQUIVOCAL" in status_upper:
             return {
                 "title": "Phenotypic / Biomarker Discordance Identified",
-                "finding": f"Status flag '{status_flag}' indicates divergence from standard diagnostic concordance.",
-                "recommendation": f"Order reflex confirmatory testing per NCCN Genetic / Familial High-Risk Criteria clinical recommendations.",
+                "finding": f"Status flag '{status_flag}' contains a demonstration review keyword.",
+                "recommendation": f"Review the status description; this rule does not determine confirmatory testing.",
             }
         return None

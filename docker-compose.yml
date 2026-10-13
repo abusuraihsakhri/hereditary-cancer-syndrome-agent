@@ -1,14 +1,13 @@
-version: '3.8'
-
 services:
   hereditary-cancer-syndrome-engine:
     build: .
     container_name: hereditary-cancer-syndrome-engine
     ports:
-      - "8000:8000"
+      - "127.0.0.1:8000:8000"
     environment:
-      - AUDIT_SECRET_KEY=hereditary-cancer-syndrome-engine-prod-audit-key-2026
+      - AUDIT_SECRET_KEY=${AUDIT_SECRET_KEY:?Set AUDIT_SECRET_KEY in your environment}
       - MODEL_PROVIDER=mock
+      - AUDIT_API_TOKEN=${AUDIT_API_TOKEN:-}
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]

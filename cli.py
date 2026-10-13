@@ -7,7 +7,7 @@ import json
 import sys
 from agents.models import SystemTaskPayload
 from agents.supervisor import SystemSupervisor
-from agents.base import AuditLogger
+from agents.base import AuditLogger, SecurityException
 
 supervisor = SystemSupervisor(model_provider="mock")
 
@@ -92,18 +92,18 @@ def main(argv=None):
             print(f"Error reading input file: {e}", file=sys.stderr)
             return 1
 
-        out_fields = fieldnames + ["overall_urgency", "integrity_status", "total_alerts", "audit_hash"]
+        out_fields = list(dict.fromkeys(fieldnames + ["overall_urgency", "integrity_status", "total_alerts", "audit_hash"]))
         out_rows = []
         errors = 0
         for idx, r in enumerate(rows):
             try:
                 payload = SystemTaskPayload(
-                    task_id=r.get("task_id", f"TASK-{idx+1:04d}"),
-                    target_identifier=r.get("target_identifier", f"TARGET-{idx+1:04d}"),
-                    primary_metric=float(r.get("primary_metric", 15.0)),
-                    secondary_metric=float(r.get("secondary_metric", 5.0)),
-                    status_descriptor=r.get("status_descriptor", "NOMINAL"),
-                    is_critical_flag=str(r.get("is_critical_flag", "")).lower() in ("true", "1", "yes"),
+                    task_id=r.get("task_id") or r.get("case_id") or f"TASK-{idx+1:04d}",
+                    target_identifier=r.get("target_identifier") or r.get("patient_synthetic_id") or f"TARGET-{idx+1:04d}",
+                    primary_metric=float(r.get("primary_metric") or r.get("metric_primary") or 15.0),
+                    secondary_metric=float(r.get("secondary_metric") or r.get("metric_secondary") or 5.0),
+                    status_descriptor=r.get("status_descriptor") or r.get("status_flag") or "NOMINAL",
+                    is_critical_flag=str(r.get("is_critical_flag") or r.get("is_stat") or "").lower() in ("true", "1", "yes"),
                 )
                 dossier = supervisor.process_task(payload)
                 row_dict = dict(r)
@@ -112,7 +112,7 @@ def main(argv=None):
                 row_dict["total_alerts"] = dossier.total_alerts
                 row_dict["audit_hash"] = dossier.audit_hash
                 out_rows.append(row_dict)
-            except (ValueError, TypeError) as e:
+            except (ValueError, TypeError, SecurityException) as e:
                 errors += 1
                 print(f"Warning: Skipping row {idx+1}: {e}", file=sys.stderr)
 
