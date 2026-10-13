@@ -20,7 +20,7 @@ The browser performs its comparisons entirely on-device. It does not save inputs
 
 ## Local Python usage
 
-Requires Python 3.10+ for the optional FastAPI server and the supported CI matrix (project packaging supports Python 3.9+).
+The package declares Python 3.9+ support; CI currently tests Python 3.10, 3.11, and 3.12.
 
 ```bash
 python -m pip install -e ".[server,dev]"
