@@ -9,7 +9,7 @@ from .engine import ClinicalDomainEngine
 
 
 class PedigreeCriteriaEvaluatorAgent:
-    """Sub-Agent 1: Primary Metric & Baseline Quality Auditor."""
+    """Sub-Agent 1: Synthetic primary threshold checker."""
     def audit(self, case: ClinicalCasePayload) -> List[AgentAlert]:
         alerts = []
         res = ClinicalDomainEngine.evaluate_primary_index(case.primary_metric)
@@ -26,7 +26,7 @@ class PedigreeCriteriaEvaluatorAgent:
 
 
 class VariantPathogenicityAgent:
-    """Sub-Agent 2: STAT Kinetics & Closed-Loop Escalation Auditor."""
+    """Sub-Agent 2: Synthetic secondary threshold/flag checker."""
     def audit(self, case: ClinicalCasePayload) -> List[AgentAlert]:
         alerts = []
         res = ClinicalDomainEngine.evaluate_secondary_kinetics(case.secondary_metric, case.is_stat)
@@ -43,7 +43,7 @@ class VariantPathogenicityAgent:
 
 
 class SurveillanceProtocolAdvisorAgent:
-    """Sub-Agent 3: Biomarker & Concordance Triager."""
+    """Sub-Agent 3: Status keyword checker."""
     def audit(self, case: ClinicalCasePayload) -> List[AgentAlert]:
         alerts = []
         res = ClinicalDomainEngine.evaluate_biomarker_concordance(case.status_flag, case.biomarkers)
@@ -93,7 +93,7 @@ class CancerGeneticsCoordinator:
             "stat_critical_alerts": stat_count,
             "warning_alerts": warn_count,
             "alerts": [a.to_dict() for a in all_alerts],
-            "guideline_standard": "NCCN Genetic / Familial High-Risk Criteria",
+            "guideline_standard": "Illustrative demonstration rules (not NCCN criteria)",
             "consensus_summary": f"Multi-agent supervision completed across 3 sub-agents with status [{status.value}].",
         }
 
@@ -105,6 +105,6 @@ class CancerGeneticsCoordinator:
         if "status" in q or "summary" in q:
             return f"HereditaryCancer Sentinel: Germline Variant & NCCN Genetic Testing Criteria Agent currently tracking {len(self.case_registry)} cases in on-premises memory."
         elif "guideline" in q or "standard" in q:
-            return "Active clinical surveillance operates under NCCN Genetic / Familial High-Risk Criteria validated protocols."
+            return "This demonstration does not implement or validate NCCN hereditary cancer criteria."
         else:
-            return f"HereditaryCancer Sentinel: Germline Variant & NCCN Genetic Testing Criteria Agent executive agent online. Zero-PHI air-gapped monitoring active."
+            return f"Synthetic demonstration coordinator ready. Do not submit patient identifiers or use for clinical decisions."
