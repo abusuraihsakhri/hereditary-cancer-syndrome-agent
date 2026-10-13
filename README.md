@@ -1,178 +1,65 @@
 # Hereditary Cancer Syndrome Agent
 
-> **Domain:** Clinical Decision Support & Biomedical Computing  
-> **Reference Guidelines & Standards:** `Standard Clinical Formulations & ISO/IEC Quality Frameworks`
+A Python rule-engine demonstration with a static browser interface. Despite the repository name, **the current implementation is not a validated hereditary cancer syndrome classifier or clinical decision-support system**. It does **not** parse three-generation pedigrees, classify germline variants, or implement NCCN genetic testing criteria.
 
-<div align="center">
+## Features
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-![Python](https://img.shields.io/badge/Python-3.10%20%7C%203.11%20%7C%203.12-3776AB.svg?logo=python&logoColor=white)
-![FastAPI](https://img.shields.io/badge/FastAPI-0.111-009688.svg?logo=fastapi&logoColor=white)
-![Audit Trail](https://img.shields.io/badge/Audit-HMAC--SHA256_Tamper--Evident-brightgreen.svg)
-![Zero-PHI Guard](https://img.shields.io/badge/Guard-Zero--PHI_Outbound-blue.svg)
-![Docker](https://img.shields.io/badge/Docker-Ready-2496ED.svg?logo=docker&logoColor=white)
+- Deterministic synthetic-input rules checking illustrative numeric thresholds and text descriptors.
+- Legacy `agents/` implementation using Pydantic 2, a command-line interface, batch CSV processing, and an optional FastAPI server.
+- Separate `hereditary_cancer_syndrome_agent/` data-class implementation and CLI (different numerical thresholds).
+- Local in-browser rule sandbox under `web/` with JSON export. It does not call the API or require Python/Pyodide.
+- Best-effort identifier-pattern checks and an **in-memory**, HMAC-chained server audit log. These do not establish HIPAA compliance, anonymity, or durable audit storage.
 
-</div>
+**Clinical limitation:** Thresholds in the Python and browser examples are arbitrary demonstration rules, not hereditary cancer risk scores, diagnostic reference intervals, or testing criteria. A normal result does not exclude hereditary cancer susceptibility. Use synthetic or otherwise non-identifiable test records only.
 
----
+## Browser interface
 
-## 📖 What It Does
+Open `web/index.html` in a current desktop or mobile browser, or use the GitHub Pages deployment when available. Enter synthetic IDs, numeric test values, a descriptor, and an optional demonstration priority flag. Select **Evaluate locally**, review the matched rules, and optionally export a JSON result.
 
-**Hereditary Cancer Syndrome Agent** is an advanced analytical and computational platform implementing NCCN 3-Generation Pedigree Genetic Testing Criteria Agent. It audits patient personal and 3-generation family cancer histories against NCCN criteria for BRCA1/2, Lynch syndrome (MLH1/MSH2/MSH6), and TP53.
+The browser performs its comparisons entirely on-device. It does not save inputs, perform server requests for evaluation, or generate cryptographic audit signatures. Its rules correspond to the illustrative `agents/workers.py` comparisons.
 
----
+## Local Python usage
 
-## ⚙️ Key Capabilities & Algorithmic Modules
-
-### 🔬 Core Algorithmic & Evaluation Engines
-
-- **`DomainKnowledgeRegistry`**: Enterprise domain rules, guideline matrices, and evidence benchmarks.
-- **`PedigreeCriteriaEvaluatorAgent`**: Specialized Sub-Agent 1 for hereditary-cancer-syndrome-agent
-- **`VariantPathogenicityAgent`**: Specialized Sub-Agent 2 for hereditary-cancer-syndrome-agent
-- **`SurveillanceProtocolAdvisorAgent`**: Specialized Sub-Agent 3 for hereditary-cancer-syndrome-agent
-
-### Specialized Workers
-
-- **`InvariantQCWorker`**: Primary Mathematical & Protocol Boundary Auditor
-- **`SafetyEscalationWorker`**: Safety Boundary, Toxicity & Emergency Interlock Worker
-- **`ProtocolConformanceWorker`**: Spec Conformance, Anomaly Triage & Discordance Checker
-
----
-
-## 💻 CLI Quickstart & Usage
-
-### Installation
+Requires Python 3.10+ for the optional FastAPI server and the supported CI matrix (project packaging supports Python 3.9+).
 
 ```bash
-pip install -r requirements.txt
-# Or install with development dependencies:
-pip install -e ".[dev]"
-```
+python -m pip install -e ".[server,dev]"
+python -m pytest -q
 
-### 1. Run a Single Audit
-```bash
-python cli.py audit --task-id TASK-001 --primary 28.5 --secondary 14.2
-```
-
-### 2. Batch Process CSV Records
-```bash
+# Pydantic-based legacy implementation
+python cli.py audit --task-id DEMO-001 --target SYNTH-001 --primary 28.5 --secondary 14.2
 python cli.py batch -i sample.csv -o results.csv
-```
-
-### 3. Interactive Chat
-```bash
-python cli.py chat "What is the system status?"
-```
-
-### 4. Verify Audit Trail Integrity
-```bash
 python cli.py verify-audit
-```
-
-### 5. Launch REST API Server
-```bash
 python cli.py serve --host 127.0.0.1 --port 8000
+
+# Separate data-class implementation
+python -m hereditary_cancer_syndrome_agent.cli audit --case-id CASE-001 --primary 21 --secondary 11
 ```
 
-### Parameter Reference
-- `--task-id`: Unique task / case identifier
-- `--target`: Entity, patient key, or genomic/cryptographic target
-- `--primary`: Primary domain measurement or score (float)
-- `--secondary`: Secondary kinetic or confidence score (float)
-- `--critical`: Trigger emergency escalation flag
-- `--status`: Status code or phenotype descriptor
-- `--input`: Input CSV file path for batch processing
-- `--output`: Output CSV file path for batch processing
+The package-installed command `hereditary-cancer-syndrome-engine` invokes the second, data-class CLI. The root-level `cli.py` invokes the Pydantic-based legacy API. These entry points are deliberately preserved for compatibility; they are not interchangeable clinical engines.
 
----
+For local API development, visit `http://127.0.0.1:8000/docs`. The `POST /api/audit` endpoint has no authentication and must not be internet-exposed or used with patient information. `GET /api/audit/logs` is disabled unless `AUDIT_API_TOKEN` is configured, and requires the `X-Audit-Token` header. `/metrics` currently returns JSON counters, not Prometheus text.
 
-## 🛡️ Security & Enterprise Architecture
+## Configuration and privacy
 
-* **Zero-PHI Outbound Interceptor:** Active regex inspection blocking SSNs, MRNs, phone numbers, and patient identifiers.
-* **Tamper-Evident HMAC-SHA256 Audit Trail:** Chained, cryptographically signed logs for every evaluation and state transition.
-* **Secure Key Management:** HMAC secret key loaded from `AUDIT_SECRET_KEY` environment variable with secure random fallback.
-* **Input Validation:** All metric values validated for finite numbers; empty identifiers rejected.
-* **Air-Gapped LLM Reasoning Adapter:** Agnostic integration for local Ollama instances (`llama3`, `mistral`), Claude 3.5 Sonnet, GPT-4o, and deterministic test mocks.
-* **Active Learning Bayesian Calibration:** Dynamic tracker updating worker reliability weights and monitoring Brier calibration drift.
-* **FastAPI & Prometheus Telemetry:** Exposes OpenAPI 3.1 REST endpoints and operational Prometheus metrics (`/metrics`).
+Set `AUDIT_SECRET_KEY` to a privately managed, long random value for server deployments; without it, the server creates an ephemeral key and audit signatures cannot be verified after restart. The audit chain also remains in memory only. Configure `AUDIT_API_TOKEN` separately if access to audit logs is required. Neither variable belongs in tracked source files or browser scripts. The `docker-compose.yml` service requires `AUDIT_SECRET_KEY` and binds to `127.0.0.1:8000` by default.
 
----
+The identifier-pattern guard is incomplete by design. Avoid all real patient data, MRNs, clinical notes, and other sensitive information. There is no formal regulatory validation, authorization model for evaluations, persistent secure database, or guaranteed de-identification.
 
-## 🧪 Testing & Verification
-
-Run the automated test suite:
+## Verification and deployment
 
 ```bash
-pytest -v
+python -m pytest -q
+python -m compileall -q agents hereditary_cancer_syndrome_agent
+node --check web/app.js
+node web/test_app.cjs
+docker build -t hereditary-cancer-demo .
 ```
 
-Execute high-throughput batch simulation benchmarks:
+GitHub Actions runs the Python test matrix, browser JavaScript checks, package build, and container build. The workflow is configured to deploy `web/` to GitHub Pages after successful checks on `master`, provided Pages is configured to use GitHub Actions in repository settings. GitHub Pages hosts only the static browser sandbox; it cannot host the FastAPI service.
 
-```bash
-python simulator.py 1000
-```
+## Stack and license
 
-### Running Specific Tests
+Python, Pydantic 2, optional FastAPI/Uvicorn, standard HTML/CSS/JavaScript, and GitHub Actions. The browser sandbox targets modern Chrome, Firefox, Safari, and Edge; no compatibility certification or clinical validation has been performed.
 
-```bash
-pytest tests/test_hereditary_cancer_syndrome_agent.py -v
-pytest tests/test_enrichment.py -v
-pytest test_hereditary_cancer.py -v
-```
-
----
-
-## 🐳 Container Deployment
-
-```bash
-docker build -t hereditary-cancer-syndrome-agent .
-docker run -p 8000:8000 -e AUDIT_SECRET_KEY=your-secret-key hereditary-cancer-syndrome-agent
-```
-
-### Docker Compose
-
-```bash
-docker-compose up
-```
-
----
-
-## 📁 Project Structure
-
-```
-hereditary-cancer-syndrome-agent/
-├── agents/                    # Core agent package
-│   ├── __init__.py
-│   ├── api.py                 # FastAPI REST endpoints
-│   ├── base.py                # Security, PHI Guard, Audit Trail
-│   ├── models.py              # Pydantic schemas
-│   ├── supervisor.py          # Supervisor orchestrator
-│   ├── workers.py             # Specialized worker agents
-│   ├── llm_factory.py         # LLM client factory
-│   ├── metrics.py             # Prometheus metrics
-│   ├── learning.py            # Bayesian calibration engine
-│   └── streamer.py            # WebSocket telemetry
-├── hereditary_cancer_syndrome_agent/  # Clinical package
-│   ├── agents.py              # Clinical sub-agents
-│   ├── cli.py                 # Clinical CLI
-│   ├── models.py              # Clinical data models
-│   ├── engine.py              # Clinical algorithmic engine
-│   └── server.py              # Clinical FastAPI server
-├── tests/                     # Test suite
-├── cli.py                     # Main CLI entry point
-├── hereditary_cancer.py       # Alternative CLI entry
-├── enrichment.py              # Enrichment feature modules
-├── simulator.py               # High-throughput simulator
-├── web/                       # Web console
-├── Dockerfile                 # Docker build config
-├── docker-compose.yml         # Docker Compose config
-└── pyproject.toml             # Project configuration
-```
-
----
-
-## 🔧 Configuration
-
-Set the following environment variables for production deployments:
-
-- `AUDIT_SECRET_KEY`: Secret key for HMAC-SHA256 audit trail (auto-generated if not set)
+[MIT License](LICENSE).
