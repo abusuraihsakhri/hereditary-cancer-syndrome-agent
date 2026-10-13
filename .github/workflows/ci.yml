@@ -1,40 +1,67 @@
-name: Hereditary Cancer Syndrome Engine CI/CD & Security Verification
+name: Python tests and Pages
 
 on:
   push:
-    branches: [ master, main ]
+    branches: [master, main]
   pull_request:
-    branches: [ master, main ]
+    branches: [master, main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
-  test-and-audit:
+  test:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         python-version: ["3.10", "3.11", "3.12"]
-
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install package and test dependencies
+        run: python -m pip install -e ".[server,dev]"
+      - name: Compile Python modules
+        run: python -m compileall -q agents hereditary_cancer_syndrome_agent hereditary_cancer.py cli.py enrichment.py
+      - name: Run all Python tests
+        run: python -m pytest -q
+      - name: Build distribution
+        run: python -m pip wheel --no-deps . -w dist
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Check browser JavaScript
+        run: |
+          node --check web/app.js
+          node web/test_app.cjs
 
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v5
-      with:
-        python-version: ${{ matrix.python-version }}
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify container build
+        run: docker build -t hereditary-cancer-demo .
 
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install fastapi uvicorn pydantic pytest
-
-    - name: Run Pytest Suite
-      run: |
-        pytest -v
-
-    - name: Security SAST & Zero-PHI Audit
-      run: |
-        python -c "
-        from agents.base import PHIGuard, AuditLogger
-        import pytest
-        assert AuditLogger.verify_integrity() is True
-        print('Security & Zero-PHI Audit Passed!')
-        "
+  pages:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    needs: [test, docker]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: web
+      - name: Deploy browser rule sandbox
+        id: deploy
+        uses: actions/deploy-pages@v4
