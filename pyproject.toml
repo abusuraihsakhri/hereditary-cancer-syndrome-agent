@@ -5,9 +5,9 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "hereditary-cancer-syndrome-engine"
 version = "2.0.1"
-description = "HereditaryCancer Sentinel: Germline Variant & NCCN Genetic Testing Criteria Engine"
+description = "Synthetic rule-engine demonstration; not clinical decision support"
 readme = "README.md"
-authors = [{ name = "Dr. Abu Suraih Sakhri", email = "abusuraih@example.com" }]
+authors = [{ name = "Dr. Abu Suraih Sakhri" }]
 license = { text = "MIT" }
 classifiers = [
     "Programming Language :: Python :: 3",
@@ -28,7 +28,7 @@ hereditary-cancer-syndrome-engine = "hereditary_cancer_syndrome_agent.cli:main"
 
 [project.urls]
 Homepage = "https://github.com/abusuraihsakhri/hereditary-cancer-syndrome-agent"
-Repository = "https://github.com/abusuraihsakhri/hereditary-cancer-syndrome-engine.git"
+Repository = "https://github.com/abusuraihsakhri/hereditary-cancer-syndrome-agent"
 
 [tool.setuptools]
 packages = ["agents", "hereditary_cancer_syndrome_agent"]
