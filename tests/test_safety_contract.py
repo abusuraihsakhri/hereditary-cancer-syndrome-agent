@@ -54,7 +54,7 @@ def test_batch_reads_supplied_case_csv_schema(tmp_path):
         row = next(csv.DictReader(fh))
     assert row["overall_urgency"] == "ELEVATED_RISK"
     assert int(row["total_alerts"]) == 3
-    assert row["task_id"] if "task_id" in row else row["case_id"] == "DEMO-1"
+    assert row["case_id"] == "DEMO-1"
 
 
 def test_audit_logs_require_explicit_token(monkeypatch):
