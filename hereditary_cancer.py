@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 HereditaryCancer Sentinel: Germline Variant & NCCN Genetic Testing Criteria Agent
-Audits patient personal and 3-generation family cancer histories against NCCN criteria for BRCA1/2, Lynch syndrome (MLH1/MSH2/MSH6), and TP53.
+Illustrative numeric rules only. Does not evaluate a pedigree, germline variants, or NCCN criteria.
 
 Domain: Cancer Genetics
 Author: Dr. Abu Suraih Sakhri
@@ -32,15 +32,15 @@ class Severity(str):
 class DomainKnowledgeRegistry:
     """Enterprise domain rules, guideline matrices, and evidence benchmarks."""
     SYSTEM_VERSION = "2.0.0-PRO-CLINICAL"
-    ZERO_PHI_COMPLIANCE = True
-    HIPAA_SAFE_HARBOR = "ACTIVE_ON_PREMISES"
+    ZERO_PHI_COMPLIANCE = False
+    HIPAA_SAFE_HARBOR = "NOT_ASSESSED"
 
     @staticmethod
     def audit_security_and_integrity(payload: Dict[str, Any]) -> List[str]:
         warnings = []
         for key in payload.keys():
             if any(phi_keyword in key.lower() for phi_keyword in ["patient_name", "ssn", "mrn_raw", "dob_raw"]):
-                warnings.append(f"PHI_DEFENSE_TRIGGERED: Direct identifier '{key}' masked to synthetic token.")
+                warnings.append(f"Identifier-like key '{key}' detected; input was not redacted.")
         return warnings
 
 class AgentAlert:
@@ -77,8 +77,8 @@ class PedigreeCriteriaEvaluatorAgent:
                     agent_name="PedigreeCriteriaEvaluatorAgent",
                     severity=Severity.WARNING,
                     title="Primary Metric Threshold Discrepancy",
-                    details=f"Primary metric value ({val1:.1f}) exceeded standard clinical baseline.",
-                    recommendation="Perform secondary cross-check and review calibration profile.",
+                    details=f"Primary synthetic metric ({val1:.1f}) exceeded illustrative limit 20.",
+                    recommendation="Review the example threshold and synthetic input values.",
                 )
             )
         return alerts
@@ -88,7 +88,7 @@ class VariantPathogenicityAgent:
     """Specialized Sub-Agent 2 for hereditary-cancer-syndrome-agent"""
     def evaluate(self, payload: Dict[str, Any]) -> List[AgentAlert]:
         alerts = []
-        is_critical = bool(payload.get("critical_flag", False))
+        is_critical = str(payload.get("critical_flag", False)).strip().lower() in ("true", "1", "yes")
         val2 = float(payload.get("metric_secondary", 5.0))
         if is_critical or val2 > 12.0:
             alerts.append(
@@ -98,7 +98,7 @@ class VariantPathogenicityAgent:
                     severity=Severity.CRITICAL,
                     title="Urgent Consensus Protocol Trigger",
                     details=f"Secondary parameter index ({val2:.1f}) triggered automated supervisory escalation.",
-                    recommendation="Initiate mandatory closed-loop clinical notification protocol.",
+                    recommendation="Review the demonstration flag; no clinical action is determined.",
                 )
             )
         return alerts
@@ -117,7 +117,7 @@ class SurveillanceProtocolAdvisorAgent:
                     severity=Severity.ADVISORY,
                     title="Biomarker / Feature Discordance Flag",
                     details=f"Phenotypic discordance noted in observation status ({status_text}).",
-                    recommendation="Reconcile correlative findings with secondary confirmatory testing.",
+                    recommendation="Review the status descriptor. This is not a testing recommendation.",
                 )
             )
         return alerts
@@ -142,7 +142,7 @@ class CancerGeneticsCoordinator:
         critical_count = sum(1 for a in all_alerts if a.severity == Severity.CRITICAL)
         warning_count = sum(1 for a in all_alerts if a.severity == Severity.WARNING)
 
-        overall_status = "CRITICAL_ACTION_REQUIRED" if critical_count > 0 else ("WARNING_ACTIVE" if warning_count > 0 else "CONCORDANT_NORMAL")
+        overall_status = "CRITICAL_ACTION_REQUIRED" if critical_count > 0 else ("WARNING_ACTIVE" if warning_count > 0 or all_alerts else "CONCORDANT_NORMAL")
 
         dossier = {
             "system": "hereditary-cancer-syndrome-agent",
@@ -165,9 +165,9 @@ class CancerGeneticsCoordinator:
         if "summary" in q or "status" in q:
             return f"HereditaryCancer Sentinel: Germline Variant & NCCN Genetic Testing Criteria Agent currently tracking {len(self.case_registry)} cases in local air-gapped memory."
         elif "guidelines" in q or "protocol" in q:
-            return "All sub-agents operate under validated consensus clinical algorithms and CAP/CLSI/NCCN/WHO standards."
+            return "The sample numeric and keyword checks are not validated clinical guidelines."
         else:
-            return f"HereditaryCancer Sentinel: Germline Variant & NCCN Genetic Testing Criteria Agent executive agent online. Continuous supervisory monitoring active across all domain parameters."
+            return f"HereditaryCancer Sentinel: Germline Variant & NCCN Genetic Testing Criteria Agent executive agent online. Synthetic demonstration available; no clinical monitoring is performed."
 
 
 coordinator = CancerGeneticsCoordinator()
@@ -180,7 +180,7 @@ def create_app():
 
         app = FastAPI(
             title="HereditaryCancer Sentinel: Germline Variant & NCCN Genetic Testing Criteria Agent",
-            description="Audits patient personal and 3-generation family cancer histories against NCCN criteria for BRCA1/2, Lynch syndrome (MLH1/MSH2/MSH6), and TP53.",
+            description="Illustrative numerical thresholds and keyword checks; not validated hereditary cancer criteria.",
             version="1.0.0",
         )
 
